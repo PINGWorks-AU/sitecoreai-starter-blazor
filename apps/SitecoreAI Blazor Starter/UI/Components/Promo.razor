@@ -1,0 +1,22 @@
+@using BlazorStarter.UI.Components.Promos
+@inherits SitecoreComponent<Promo.ViewModel>
+
+@if ( Model.RenderingVariant == VARIANT_WITH_TEXT )
+{
+	<WithTextVariant Model="Model" Id="@Id" />
+}
+else
+{
+	<DefaultVariant Model="Model" Id="@Id" />
+}
+
+@code {
+	public const string VARIANT_WITH_TEXT = "WithText";
+
+	public sealed class ViewModel : ViewModelBase
+	{
+		public ImageField? PromoIcon { get; set; }
+		public StringField? PromoText { get; set; }
+		public HyperlinkField? PromoLink { get; set; }
+	}
+}

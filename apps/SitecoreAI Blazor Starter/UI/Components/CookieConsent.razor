@@ -1,0 +1,54 @@
+@using Microsoft.Extensions.Options
+@using PINGWorks.SitecoreAI.BlazorSDK.Settings
+
+@inject IHttpContextAccessor Hc
+@inject IOptions<SitecoreSettings> Settings
+@inject ISitecoreContextAccessor Sitecore
+
+@if ( ShowPanel )
+{
+	<ComponentScript Src="./UI/Components/CookieConsent.razor.js" />
+
+	<div class="consent" id="consent-panel" role="dialog" aria-label="Cookie preferences" aria-modal="false">
+		<div class="consent__inner">
+			<div class="consent__text">
+				<div class="consent__lbl">Cookies</div>
+				<p class="consent__body">
+					We use cookies on this site to measure performance and personalise your experience.
+					Select what you are comfortable with - you can change this at any time.
+				</p>
+			</div>
+			<div class="consent__controls">
+				<label class="consent__toggle">
+					<input type="checkbox" id="events-enabled" checked="checked" />
+					<span>Analytics</span>
+				</label>
+				<label class="consent__toggle">
+					<input type="checkbox" id="profile-enabled" checked="checked" />
+					<span>Personalisation</span>
+				</label>
+				<button type="button" class="consent__save" onclick="updateConsent()">
+					Save preferences
+				</button>
+			</div>
+		</div>
+	</div>
+}
+
+@code {
+	private bool ShowPanel;
+
+	// suppress while editing/designing
+	protected override void OnInitialized()
+	{
+		if ( Sitecore.Current.IsEditing )
+			return;
+
+		string? eventConsent = null, profileConsent = null, browserId = null;
+		Hc.HttpContext?.Request.Cookies.TryGetValue( Settings.Value.Analytics.EnableEventsCookie, out eventConsent );
+		Hc.HttpContext?.Request.Cookies.TryGetValue( Settings.Value.Analytics.EnableProfileCookie, out profileConsent );
+		Hc.HttpContext?.Request.Cookies.TryGetValue( Settings.Value.Analytics.EventsCookie.Name, out browserId );
+
+		ShowPanel = (eventConsent is null && profileConsent is null) || string.IsNullOrEmpty( browserId );
+	}
+}

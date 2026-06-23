@@ -1,0 +1,9 @@
+<div class="wrapper">
+	<div class="basic-text">
+		<ScText Field="Model.ContentText" />
+	</div>
+</div>
+
+@code {
+	[Parameter, EditorRequired] public required Components.Content.ViewModel Model { get; set; }
+}

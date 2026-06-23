@@ -1,0 +1,25 @@
+<div class="component image @Model.Styles @Model.GridParameters" id="@Id">
+	<div class="component-content">
+		<span class="sc-image-wrapper">
+			@if ( IsEditing || string.IsNullOrWhiteSpace( Model.TargetUrl?.Value?.Href ) )
+			{
+				<ScImage Field="Model.Image" />
+			}
+			else
+			{
+				<ScLink Field="@Model.TargetUrl">
+					<ScImage Field="Model.Image" />
+				</ScLink>
+			}
+		</span>
+		<span class="image-caption field-imagecaption">
+			<ScText Field="Model.ImageCaption" />
+		</span>
+	</div>
+</div>
+
+@code {
+	[Parameter, EditorRequired] public required Components.Banner.ViewModel Model { get; set; }
+	[Parameter, EditorRequired] public required string? Id { get; set; }
+	[Parameter, EditorRequired] public required bool IsEditing { get; set; }
+}

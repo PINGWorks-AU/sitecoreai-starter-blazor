@@ -1,0 +1,57 @@
+﻿@inherits SitecoreComponent<Container.ViewModel>
+
+@if ( UseWrapper )
+{
+	<div class="container-wrapper">
+		@RenderContent()
+	</div>
+}
+else
+{
+	@RenderContent()
+}
+
+@code {
+	/*
+	 * A ViewModel contains the data properties for the component.
+	 * Binding is handled by the BlazorSDK based on conventions and
+	 * attributes.
+	 *
+	 * You can use primitive types (such as string, int, bool, etc.),
+	 * and names that map directly to the GraphQL data structure.
+	 *
+	 * As long as the names are unique they will be automatically resolved
+	 * across the ComponentParameter and Fields collections automatically.
+	 *
+	 * Use the [SitecoreComponentParam] or the [SitecoreField] attributes to
+	 * explicitly mark a property's source as needed, or to override the
+	 * name matching.
+	 */
+	public sealed class ViewModel : ViewModelBase
+	{
+		public string? BackgroundImage { get; set; }
+	}
+
+	public bool UseWrapper => Array.Exists( ( Model.Styles?.Value ?? string.Empty ).Split(' '), s => s == "container" );
+	private string BackgroundStyle => GetBackgroundStyle();
+
+	private string GetBackgroundStyle()
+	{
+		var match = RxMediaUrl.Match( Model.BackgroundImage ?? string.Empty );
+		if ( match.Success )
+			return $"background-image: url('{match.Groups[1].Value}')";
+
+		return string.Empty;
+	}
+
+	private RenderFragment RenderContent()
+	{
+		return @<div class="component container-default @Model.GridParameters @Model.Styles" style="@BackgroundStyle" id="@Id">
+					<div class="component-content">
+						<div class="row">
+							<ScPlaceholder Name="container-{*}" />
+						</div>
+					</div>
+				</div>;
+	}
+}

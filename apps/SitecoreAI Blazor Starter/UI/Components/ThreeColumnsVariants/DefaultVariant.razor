@@ -1,0 +1,21 @@
+<section class="three-column">
+	<div class="wrapper">
+		<div class="three-column__container basic-text">
+			<div class="three-column__item basic-list">
+				<ScPlaceholder Name="content-one" />
+			</div>
+			<div class="three-column__item basic-list">
+				<div class="three-column__list">
+					<ScPlaceholder Name="content-two" />
+				</div>
+			</div>
+			<div class="three-column__item basic-list">
+				<ScPlaceholder Name="content-three" />
+			</div>
+		</div>
+	</div>
+</section>
+
+@code {
+	[Parameter, EditorRequired] public required Components.ThreeColumns.ViewModel Model { get; set; }
+}

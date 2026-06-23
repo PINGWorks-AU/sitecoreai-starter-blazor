@@ -1,0 +1,17 @@
+@using BlazorStarter.UI.Components.ThreeColumnsVariants
+@inherits SitecoreComponent<ThreeColumns.ViewModel>
+
+@if ( Model.RenderingVariant == NO_PADDING )
+{
+	<NoPaddingVariant Model="Model" />
+}
+else
+{
+	<DefaultVariant Model="Model" />
+}
+
+@code {
+	private const string NO_PADDING = "NoPadding";
+
+	public sealed class ViewModel : ViewModelBase { }
+}

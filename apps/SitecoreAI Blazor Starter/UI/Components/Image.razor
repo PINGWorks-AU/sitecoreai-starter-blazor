@@ -1,0 +1,15 @@
+@inherits SitecoreComponent<Image.ViewModel>
+
+<section class="banner-image">
+	<div class="banner-image__inner">
+		<ScImage Field="@Model.ImageDesktop" Class="image-desktop" />
+		<ScImage Field="@Model.ImageMobile" Class="image-mobile" />
+	</div>
+</section>
+@code {
+	public sealed class ViewModel : ViewModelBase
+	{
+		public ImageField? ImageDesktop { get; set; }
+		public ImageField? ImageMobile { get; set; }
+	}
+}

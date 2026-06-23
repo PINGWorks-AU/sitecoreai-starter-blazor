@@ -1,0 +1,56 @@
+<Solution>
+  <Folder Name="/.config/">
+    <File Path=".config/dotnet-tools.json" />
+  </Folder>
+  <Folder Name="/.sitecore/" />
+  <Folder Name="/.sitecore/schemas/">
+    <File Path=".sitecore/schemas/ModuleFile.schema.json" />
+    <File Path=".sitecore/schemas/RootConfigurationFile.schema.json" />
+  </Folder>
+  <Folder Name="/authoring/" />
+  <Folder Name="/authoring/items/">
+    <File Path="authoring/items/blazor-starter.module.json" />
+  </Folder>
+  <Folder Name="/authoring/items/blazor-starter/" />
+  <Folder Name="/authoring/items/blazor-starter/DefaultRenderingHost/">
+    <File Path="authoring/items/blazor-starter/DefaultRenderingHost/Default.yml" />
+  </Folder>
+  <Folder Name="/docs/">
+    <File Path="docs/analytics-tracking.md" />
+    <File Path="docs/anatomy.md" />
+    <File Path="docs/multi-language.md" />
+    <File Path="docs/page-security.md" />
+    <File Path="docs/personalisation.md" />
+    <File Path="docs/routing.md" />
+    <File Path="docs/authoring-enabled-components.md" />
+    <File Path="docs/caching-sync.md" />
+    <File Path="docs/component-script.md" />
+    <File Path="docs/components.md" />
+    <File Path="docs/design-studio.md" />
+    <File Path="docs/editing.md" />
+    <File Path="docs/error-handling.md" />
+    <File Path="docs/forms.md" />
+    <File Path="docs/graphql.md" />
+    <File Path="docs/index.md" />
+    <File Path="docs/installation.md" />
+    <File Path="docs/ip-path-security.md" />
+    <File Path="docs/models.md" />
+    <File Path="docs/search.md" />
+    <File Path="docs/settings.md" />
+    <File Path="docs/tools-cache.md" />
+    <File Path="docs/tools-edge-settings.md" />
+    <File Path="docs/tools-graphql.md" />
+    <File Path="docs/tools-webhooks.md" />
+    <File Path="docs/tools.md" />
+    <File Path="docs/what-happened-to-helix.md" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="nuget.config" />
+    <File Path="README.md" />
+    <File Path="sitecore.json" />
+    <File Path="xmcloud.build.json" />
+  </Folder>
+  <Project Path="apps/SitecoreAI Blazor Starter/SitecoreAI Blazor Starter.csproj" />
+</Solution>

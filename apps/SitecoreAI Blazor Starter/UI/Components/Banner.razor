@@ -1,0 +1,29 @@
+@using BlazorStarter.UI.Components.Banners
+@inherits SitecoreComponent<Banner.ViewModel>
+
+@if ( Model.RenderingVariant == VARIANT_DEFAULT )
+{
+	<DefaultVariant Model="Model" />
+}
+else if ( Model.RenderingVariant == VARIANT_BANNER )
+{
+	<BannerVariant Model="Model" Id="@Id" IsEditing="IsEditing" />
+}
+else
+{
+	<ImageVariant Model="Model" Id="@Id" IsEditing="IsEditing" />
+}
+
+@code {
+	private const string VARIANT_BANNER = "Banner";
+	private const string VARIANT_DEFAULT = "Default";
+
+	public sealed class ViewModel : ViewModelBase
+	{
+		public HyperlinkField? TargetUrl { get; set; }
+		public ImageField? Image { get; set; }
+		public StringField? ImageCaption { get; set; }
+		public ImageField? ImageDesktop => Image;
+		public ImageField? ImageMobile { get; set; }
+	}
+}

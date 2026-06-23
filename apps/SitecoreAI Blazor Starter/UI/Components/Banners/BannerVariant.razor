@@ -1,0 +1,22 @@
+<div class="component hero-banner @Model.Styles @Model.GridParameters @BannerClassHeroBannerEmpty" id="@Id">
+	<div class="component-content sc-sxa-image-hero-banner" style="@BannerBackgroundStyle">
+		@if ( IsEditing )
+		{
+			<div class="image">
+				<ScImage Field="@Model.Image" />
+			</div>
+		}
+	</div>
+</div>
+
+@code {
+	[Parameter, EditorRequired] public required Components.Banner.ViewModel Model { get; set; }
+	[Parameter, EditorRequired] public required string? Id { get; set; }
+	[Parameter, EditorRequired] public required bool IsEditing { get; set; }
+
+	private string BannerClassHeroBannerEmpty
+		=> !IsEditing && string.IsNullOrWhiteSpace( Model.Image?.Value?.Src ) ? "hero-banner-empty" : string.Empty;
+
+	private string BannerBackgroundStyle
+		=> !string.IsNullOrWhiteSpace( Model?.Image?.Value?.Src ) && !IsEditing ? $"background-image: url('{Model.Image?.Value?.Src}')" : string.Empty;
+}

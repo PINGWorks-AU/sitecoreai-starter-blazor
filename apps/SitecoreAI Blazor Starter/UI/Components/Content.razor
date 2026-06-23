@@ -1,0 +1,42 @@
+@using BlazorStarter.UI.Components.Contents
+@inherits SitecoreComponent<Content.ViewModel>
+
+@if ( Model.Styles?.IsNotEmpty ?? false )
+{
+	@*
+		If your 'CSS Styles' field contains raw CSS rather than CSS class names, you
+		can render a style-block inline
+	*@
+	<style>
+		@Model.Styles
+	</style>
+}
+
+@if ( IsEditing || !string.IsNullOrWhiteSpace( Model.ContentHeading?.Value ) )
+{
+	<div class="wrapper">
+		<h2 class="main-title"><ScText Field="Model.ContentHeading" /></h2>
+	</div>
+}
+
+@if ( IsEditing || Model.ContentText is not null )
+{
+	if ( Model.RenderingVariant == SPECIAL_CONTENT )
+	{
+		<SpecialVariant Model="Model" />
+	}
+	else
+	{
+		<DefaultVariant Model="Model" />
+	}
+}
+
+@code {
+	private const string SPECIAL_CONTENT = "Special";
+
+	public sealed class ViewModel : ViewModelBase
+	{
+		public StringField? ContentHeading { get; set; }
+		public StringField? ContentText { get; set; }
+	}
+}

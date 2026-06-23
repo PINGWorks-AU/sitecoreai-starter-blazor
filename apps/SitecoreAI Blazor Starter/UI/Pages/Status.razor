@@ -1,0 +1,25 @@
+@page "/status-{StatusCode:int}"
+@layout MainLayout
+
+@* 404 and 500 go through ScErrorContent so they pick up any Sitecore-configured Error404 /
+   Error500 page. Fallbacks are added in case Sitecore is not fully configured.
+   Other status codes are the consumer's responsibility and can be handled inline here. *@
+@switch ( StatusCode )
+{
+	case 404:
+	case 500:
+		<ScErrorContent StatusCode="@StatusCode" />
+		break;
+	case 403:
+		<h1>Forbidden</h1>
+		<p>You don't have permission to view that page.</p>
+		break;
+	default:
+		<h1>Status @StatusCode</h1>
+		<p>Something went wrong.</p>
+		break;
+}
+
+@code {
+	[Parameter] public int StatusCode { get; set; } = 404;
+}

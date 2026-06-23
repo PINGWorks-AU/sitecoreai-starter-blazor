@@ -1,0 +1,27 @@
+﻿<ul class="clearfix">
+	@foreach ( var navItem in Items ?? [] )
+	{
+		<li class="@GetItemClass( navItem )">
+			<div class="@GetItemClassInner( navItem )">
+				<a href="@navItem.Href">
+					<ScText Field="@navItem.NavigationTitle" />
+				</a>
+			</div>
+			<NavigationMenu Items="navItem.Children" Level="@(Level + 1)" />
+		</li>
+	}
+</ul>
+
+@code {
+	[Parameter] public IEnumerable<Navigation.ViewModel.NavigationItem> Items { get; set; } = [];
+	[Parameter] public int Level { get; set; } = 0;
+
+	private string GetItemClass( Navigation.ViewModel.NavigationItem item )
+		=> CssClassBuilder.Start( [..item.Styles ?? []] )
+				.With( $"rel-level{Level}" )
+				.Build();
+	private string GetItemClassInner( Navigation.ViewModel.NavigationItem item )
+		=> CssClassBuilder.Start( "navigation-title" )
+				.With( "child", item.Children?.Count > 0 )
+				.Build();
+}

@@ -1,0 +1,42 @@
+@inherits SitecoreComponent<Form.ViewModel>
+@inject ISitecoreFormsSdk Forms
+@inject ISitecoreTracking Trk
+
+@if ( HasRecaptcha )
+{
+	<ComponentScript Src="./UI/Components/Form.razor.js" Arg="@Id" />
+}
+
+<div class="@Model.Styles" style="max-width: 100%" id="@Id">
+	@if ( FormContent is not null )
+	{
+		@FormContent
+	}
+</div>
+
+@code {
+	public sealed class ViewModel : ViewModelBase
+	{
+		[SitecoreComponentParam]
+		public string? FormId { get; set; }
+	}
+
+	private MarkupString? FormContent;
+	private bool HasRecaptcha
+		=> FormContent?.Value.Contains( "grecaptcha" ) ?? false;
+
+	protected override async Task OnInitializedAsync()
+	{
+		await base.OnInitializedAsync();
+
+		if ( string.IsNullOrEmpty( Model.FormId ) )
+			return;
+
+		var formResp = await Forms.GetForm( Model.FormId ).ConfigureAwait( false );
+		if ( !formResp.IsSuccessful || string.IsNullOrEmpty( formResp.Result ) )
+			return;
+
+		FormContent = new MarkupString( formResp.Result );
+		await Trk.RecordFormEvent( Id!, Model.FormId, FormInteraction.Viewed );
+	}
+}

@@ -1,0 +1,18 @@
+<section class="two-column">
+	<div class="wrapper">
+		<div class="two-column__container basic-text">
+			<div class="two-column__item basic-list">
+				<ScPlaceholder Name="content-left" />
+			</div>
+			<div class="two-column__item basic-list">
+				<div class="two-column__list">
+					<ScPlaceholder Name="content-right" />
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+@code {
+	[Parameter, EditorRequired] public required Components.TwoColumns.ViewModel Model { get; set; }
+}

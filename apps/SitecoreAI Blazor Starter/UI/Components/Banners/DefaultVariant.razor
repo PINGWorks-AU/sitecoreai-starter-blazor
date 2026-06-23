@@ -1,0 +1,10 @@
+<section class="banner-image">
+    <div class="banner-image__inner">
+        <ScImage Field="@Model.ImageDesktop" Class="image-desktop" />
+        <ScImage Field="@Model.ImageMobile" Class="image-mobile" />
+    </div>
+</section>
+
+@code {
+    [Parameter, EditorRequired] public required Components.Banner.ViewModel Model { get; set; }
+}

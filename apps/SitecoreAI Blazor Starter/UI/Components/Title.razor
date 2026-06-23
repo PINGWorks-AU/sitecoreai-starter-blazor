@@ -1,0 +1,73 @@
+@using global::PINGWorks.SitecoreExperienceEdge.ContentSDK.Fields
+
+@inherits SitecoreComponent<Title.ViewModel>
+
+<div class="component title @Model.Styles @Model.GridParameters" id="@Id">
+	<div class="component-content">
+		<div class="field-title">
+			@if ( IsEditing )
+			{
+				<ScText Field="Model.Text" />
+			}
+			else
+			{
+				<a href="@Model.Link"> @( Model.Text?.Value ?? "[Not set]" ) </a>
+			}
+		</div>
+	</div>
+</div>
+
+@code {
+	public sealed class ViewModel : ViewModelBase
+	{
+		[SitecoreComponentField( "data" )]
+		public TitleData? Data { get; set; }
+
+		public HyperlinkField Link => new HyperlinkField(
+										new HyperlinkField.AnchorHyperlinkFieldProperties {
+											Anchor = TitleLocation?.Url?.Path,
+											Title = TitleLocation?.Field?.JsonValue?.Value
+										} );
+
+		public StringField? Text => CreateTextField();
+
+		private TitleData.TitleLocation? TitleLocation => Data?.DataSource ?? Data?.ContextItem;
+
+		public StringField? CreateTextField()
+		{
+			var jsVal = TitleLocation?.Field?.JsonValue;
+
+			if ( jsVal?.MetaData is null )
+				return null;
+
+			return new( jsVal.Value ?? string.Empty ) { MetaData = jsVal.MetaData };
+		}
+
+		public class TitleData
+		{
+			public TitleLocation? DataSource { get; set; }
+			public TitleLocation? ContextItem { get; set; }
+
+			public class TitleLocation
+			{
+				public TitleUrl? Url { get; set; }
+				public TitleField? Field { get; set; }
+
+				public class TitleUrl
+				{
+					public string? Path { get; set; }
+					public string? SiteName { get; set; }
+				}
+				public class TitleField
+				{
+					public TitleFieldValue? JsonValue { get; set; }
+					public class TitleFieldValue
+					{
+						public required FieldMetaData MetaData { get; set; }
+						public required string Value { get; set; }
+					}
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,23 @@
+﻿@inherits SitecoreComponent<RichText.ViewModel>
+
+<div class="component rich-text @Model.GridParameters @Model.Styles" id="@Id">
+	<div class="component-content">
+		@if ( IsUnset )
+		{
+			<span class="is-empty-hint">Rich text</span>
+		}
+		else
+		{
+			<ScRichText Field="@Model.Text"></ScRichText>
+		}
+	</div>
+</div>
+
+@code {
+	public sealed class ViewModel : ViewModelBase
+	{
+		public RichTextField? Text { get; set; }
+	}
+
+	private bool IsUnset => string.IsNullOrEmpty( Model.Text?.Value );
+}

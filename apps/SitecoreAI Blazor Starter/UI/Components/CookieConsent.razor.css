@@ -1,0 +1,132 @@
+/* Cookie consent panel - pinned to viewport bottom, sits above all page content. */
+.consent {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	/* Max-safe integer minus a bit; defensive against any page that tries
+	   to claim the very top of the stacking context. */
+	z-index: 2147483000;
+	background: #0e0e0e;
+	color: #fff;
+	border-top: 4px solid currentColor;
+	box-shadow: 0 -12px 32px rgba(0, 0, 0, .35);
+	padding: 20px 24px;
+	animation: consent-slide-up 320ms cubic-bezier(0.23, 1, 0.32, 1);
+	font-family: "Helvetica Neue", Arial, sans-serif;
+}
+
+.consent__inner {
+	max-width: 1280px;
+	margin: 0 auto;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	gap: 32px;
+	align-items: center;
+}
+
+.consent__text { min-width: 0; }
+
+.consent__lbl {
+	font-size: 10px;
+	letter-spacing: .22em;
+	text-transform: uppercase;
+	margin-bottom: 6px;
+}
+
+.consent__body {
+	font-size: 13px;
+	line-height: 1.55;
+	color: rgba(255, 255, 255, .78);
+	margin: 0;
+	max-width: 640px;
+}
+
+.consent__controls {
+	display: flex;
+	align-items: center;
+	gap: 24px;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+}
+
+.consent__toggle {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 11px;
+	letter-spacing: .14em;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, .85);
+	cursor: pointer;
+	user-select: none;
+}
+
+.consent__toggle input {
+	width: 16px;
+	height: 16px;
+	cursor: pointer;
+	margin: 0;
+}
+
+.consent__save {
+	display: inline-flex;
+	align-items: center;
+	gap: 12px;
+	background: #fff;
+	color: #000;
+	font-weight: 700;
+	font-size: 11px;
+	letter-spacing: .16em;
+	text-transform: uppercase;
+	padding: 14px 22px;
+	border: none;
+	cursor: pointer;
+	transition: opacity 180ms cubic-bezier(0.23, 1, 0.32, 1),
+				transform 120ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.consent__save:hover { opacity: 0.85; }
+.consent__save:active { transform: scale(.97); }
+
+.consent__save:focus-visible {
+	outline: 2px solid #fff;
+	outline-offset: 3px;
+}
+
+/* Exit animation, triggered by JS adding the .is-leaving class before display:none. */
+.consent.is-leaving {
+	animation: consent-slide-down 240ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes consent-slide-up {
+	from { opacity: 0; transform: translateY(100%); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes consent-slide-down {
+	from { opacity: 1; transform: translateY(0); }
+	to { opacity: 0; transform: translateY(100%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.consent,
+	.consent.is-leaving { animation: none; }
+	.consent__save { transition: none; }
+}
+
+@media (max-width: 720px) {
+	.consent { padding: 16px; }
+	.consent__inner { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+	.consent__controls {
+		justify-content: flex-start;
+		flex-direction: column;
+		align-items: stretch;
+		gap: 12px;
+	}
+	.consent__toggle { font-size: 12px; }
+	.consent__save {
+		justify-content: center;
+		padding: 16px 20px;
+	}
+}

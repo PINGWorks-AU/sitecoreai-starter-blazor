@@ -1,0 +1,19 @@
+{
+    "$schema": "../../.sitecore/schemas/ModuleFile.schema.json",
+    "namespace": "blazor-starter",
+    "items": {
+        "path": "blazor-starter",
+        "includes": [
+            {
+                "name": "DefaultRenderingHost",
+                "path": "/sitecore/system/Settings/Services/Rendering Hosts/Default",
+                "scope": "singleItem"
+            },
+			{
+                "name": "Datasource Item and Children Resolver For BlazorSDK",
+                "path": "/sitecore/system/Modules/Layout Service/Rendering Contents Resolvers/Datasource Item and Children Resolver For BlazorSDK",
+                "scope": "singleItem"
+            }
+        ]
+    }
+}

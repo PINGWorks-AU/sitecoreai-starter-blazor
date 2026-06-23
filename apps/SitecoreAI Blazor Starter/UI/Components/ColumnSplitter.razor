@@ -1,0 +1,50 @@
+﻿@inherits SitecoreComponent<ColumnSplitter.ViewModel>
+
+<div class="row component column-splitter @Model.Styles @Model.GridParameters" id="@Id">
+	@foreach ( int id in Model.EnabledPlaceholderIds )
+	{
+		<div class="@GetClass( id )">
+			<div class="row">
+				<ScPlaceholder Name="@( $"column-{id}-{{*}}" )" />
+			</div>
+		</div>
+	}
+</div>
+
+@code {
+	public sealed class ViewModel : ViewModelBase
+	{
+		#pragma warning disable S2376
+		public string? Styles1 { set { ColumnStyles[1] = value ?? string.Empty; } }
+		public string? Styles2 { set { ColumnStyles[2] = value ?? string.Empty; } }
+		public string? Styles3 { set { ColumnStyles[3] = value ?? string.Empty; } }
+		public string? Styles4 { set { ColumnStyles[4] = value ?? string.Empty; } }
+		public string? Styles5 { set { ColumnStyles[5] = value ?? string.Empty; } }
+		public string? Styles6 { set { ColumnStyles[6] = value ?? string.Empty; } }
+		public string? Styles7 { set { ColumnStyles[7] = value ?? string.Empty; } }
+		public string? Styles8 { set { ColumnStyles[8] = value ?? string.Empty; } }
+
+		public string? ColumnWidth1 { set { ColumnWidths[1] = value ?? string.Empty; } }
+		public string? ColumnWidth2 { set { ColumnWidths[2] = value ?? string.Empty; } }
+		public string? ColumnWidth3 { set { ColumnWidths[3] = value ?? string.Empty; } }
+		public string? ColumnWidth4 { set { ColumnWidths[4] = value ?? string.Empty; } }
+		public string? ColumnWidth5 { set { ColumnWidths[5] = value ?? string.Empty; } }
+		public string? ColumnWidth6 { set { ColumnWidths[6] = value ?? string.Empty; } }
+		public string? ColumnWidth7 { set { ColumnWidths[7] = value ?? string.Empty; } }
+		public string? ColumnWidth8 { set { ColumnWidths[8] = value ?? string.Empty; } }
+		#pragma warning restore S2376
+
+		public string? EnabledPlaceholders { get; set; }
+
+		// these properties are ignored by the binder because they are not settable
+
+		// ignore pos 0
+		public string[] ColumnStyles { get; } = [.. Enumerable.Repeat( String.Empty, 9 )];
+		public string[] ColumnWidths { get; } = [.. Enumerable.Repeat( String.Empty, 9 )];
+
+		public int[] EnabledPlaceholderIds => [.. (EnabledPlaceholders ?? string.Empty).Split( ',' ).Select( int.Parse )];
+	}
+
+	private string GetClass( int idx )
+		=> $"{Model.ColumnWidths[idx]} {Model.ColumnStyles[idx]}";
+}

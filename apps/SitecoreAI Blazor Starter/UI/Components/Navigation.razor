@@ -1,0 +1,38 @@
+@using global::PINGWorks.SitecoreExperienceEdge.ContentSDK.Fields
+
+@inherits SitecoreComponent<Navigation.ViewModel>
+
+<div class="component navigation @Model.Styles @Model.GridParameters" id="@Id">
+	<label class="menu-mobile-navigate-wrapper">
+		<input type="checkbox" class="menu-mobile-navigate" />
+		<div class="menu-humburger"></div>
+		<div class="component-content">
+			<nav>
+				<NavigationMenu Items="Model.Items" />
+			</nav>
+		</div>
+	</label>
+</div>
+
+@code {
+	public sealed class ViewModel : ViewModelBase
+	{
+		// This field marker is used with custom Rendering Contents Resolvers like the JSS
+		// Navigation Contents Resolver which return array json data. This gets shifted by
+		// the SDK into the custom field keyed `FieldDictionary.CustomContentFieldKey` but
+		// which is more easily accessed with this helper attribute.
+		[SitecoreDatasourceItemList, SitecoreRestoreHierarchy]
+		public List<NavigationItem>? Items { get; set; }
+
+		public class NavigationItem
+		{
+			public string? Id { get; set; }
+			public List<string>? Styles { get; set; } = [];
+			public string? Href { get; set; }
+			public string? QueryString { get; set; }
+			public StringField? NavigationTitle { get; set; }
+
+			public List<NavigationItem>? Children { get; set; } = [];
+		}
+	}
+}
