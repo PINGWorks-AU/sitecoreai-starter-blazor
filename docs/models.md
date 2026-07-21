@@ -59,6 +59,7 @@ The SDK can bind a property from any of the following sources, in this priority 
 | - | - | - |
 | 0 | `[SitecoreIgnore]` | Skip - the property is not bound at all. |
 | 1 | `[SitecoreComponentField]` | A field on the current component's datasource item. |
+| 1 | `[SitecoreRenderingGraphQL]` | Custom GraphQL content from the current component's definition (uses the `data` field). |
 | 2 | `[SitecoreComponentParam]` | A value from the component's rendering parameters. |
 | 3 | `[SitecoreComponentProperty( name )]` | A well-known property of the current component (`UId`\|`ComponentName`\|`DataSource`, see `SitecoreComponentPropertyNames`). |
 | 4 | `[SitecoreLinkedItemField]` | A field on a linked item, used during recursive binding of `ItemLinkField` collections. |
@@ -133,6 +134,7 @@ The following converters are supplied by the SDK and cover the majority of use-c
 | ItemLinkToStringConverter | ItemLinkField | String | Returns the linked item's DisplayName, Name or Id (whichever is available in that order). |
 | ItemLinkToGuidConverter | ItemLinkField | Guid | Returns the linked item's Id. |
 | ItemLinkToObjectConverter | ItemLinkField | Class Type | Recursive bind to target Type's properties, returning the instance. |
+| JsonSerializedFieldConverter | JsonSerializedField | Class Type | Returns the target Type deserialized from the component's custom GraphQL content. |
 | NaturalValueConverter | ValueField&lt;TVal&gt; | TVal | Returns the inner value of the field, removing editing metadata. |
 | StringAsGuidConverter | String | Guid | Returns a String property as a Guid (e.g. in Item Id) via relaxed parsing |
 
@@ -258,7 +260,13 @@ Because `AccordionItemModel` declares a nested `Items` of the same type, the res
 >
 > To gain full control over the deserialisation process, return the "Items" property as a string and it will contain the source Json. You can then implement manual deserialisation to handle edge cases not supported by the default binder.
 
-## `SitecoreDatasourceItemList` for fields-as-array resolvers
+## `SitecoreRenderingGraphQLAttribute` for renderings with custom GraphQL content
+
+Apply this attribute to a ViewModel's property when the component uses custom GraphQL query data rather than normal datasource or route templates. Sitecore returns the GraphQL content in the well-known field `data` internally, so this attribute performs the same job as `SitecoreComponentField("data")`.
+
+Use this attribute instead for clarity of intent.
+
+## `SitecoreDatasourceItemListAttribute` for fields-as-array resolvers
 
 The pattern above assumes the resolver's items arrive in the layout under the standard `items` field as an `ItemLinksField` - that is, the rendering's `fields` value is still a dictionary, and `items` is one entry in it. The vast majority of resolvers behave this way and bind through plain name matching.
 

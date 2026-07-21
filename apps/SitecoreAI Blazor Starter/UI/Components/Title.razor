@@ -20,7 +20,7 @@
 @code {
 	public sealed class ViewModel : ViewModelBase
 	{
-		[SitecoreComponentField( "data" )]
+		[SitecoreRenderingGraphQL]
 		public TitleData? Data { get; set; }
 
 		public HyperlinkField Link => new HyperlinkField(
