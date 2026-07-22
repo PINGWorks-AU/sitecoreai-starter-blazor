@@ -25,7 +25,7 @@ app.UseHttpsRedirection();
 app.UseRequestLocalization();
 app.UseAntiforgery();
 
-app.MapStaticAssets();
+app.MapStaticAssets().ShortCircuit();                                                         // Abort additional pipelines for static assets
 app.MapRazorComponents<App>()
 	.AddInteractiveServerRenderMode( opt => opt.ContentSecurityFrameAncestorsPolicy = null )  // Sitecore BlazorSDK will write its own CSP policies
 		.AddAdditionalAssemblies( typeof( SitecorePage ).Assembly );                          // Sitecore BlazorSDK adds default route handling
