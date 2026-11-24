@@ -260,12 +260,6 @@ Because `AccordionItemModel` declares a nested `Items` of the same type, the res
 >
 > To gain full control over the deserialisation process, return the "Items" property as a string and it will contain the source Json. You can then implement manual deserialisation to handle edge cases not supported by the default binder.
 
-## `SitecoreRenderingGraphQLAttribute` for renderings with custom GraphQL content
-
-Apply this attribute to a ViewModel's property when the component uses custom GraphQL query data rather than normal datasource or route templates. Sitecore returns the GraphQL content in the well-known field `data` internally, so this attribute performs the same job as `SitecoreComponentField("data")`.
-
-Use this attribute instead for clarity of intent.
-
 ## `SitecoreDatasourceItemListAttribute` for fields-as-array resolvers
 
 The pattern above assumes the resolver's items arrive in the layout under the standard `items` field as an `ItemLinksField` - that is, the rendering's `fields` value is still a dictionary, and `items` is one entry in it. The vast majority of resolvers behave this way and bind through plain name matching.
@@ -292,6 +286,24 @@ The Starter Kit's `Navigation.razor` does this for the JSS Navigation Contents R
 
 > [!NOTE]
 > This is genuinely an edge case. Reach for `[SitecoreDatasourceItemList]` only when you know the resolver replaces the entire `fields` value with a JSON array. Ordinary multi-item resolvers (the ones described in the previous section) bind through the standard `items` field without it.
+
+## `SitecoreRenderingGraphQLAttribute` for rendering GraphQL queries
+
+A rendering can carry its own GraphQL query (the **Component GraphQL Query** field on the rendering item). Edge runs the query and places its result in the rendering's `fields` under a `data` key, in place of the datasource fields.
+
+Annotate a property with `[SitecoreRenderingGraphQL]` to bind it to that result:
+
+```cs
+public class RelatedArticlesModel
+{
+    [SitecoreRenderingGraphQL]
+    public RelatedArticlesQueryResult? Data { get; set; }
+}
+```
+
+The attribute is an alias over `[SitecoreComponentField( "data" )]` (`FieldDictionary.GraphQLFieldKey`). The JSON result is deserialised into the property's type, so shape that type to match your query's selection set. Bind it to a `string` to receive the raw JSON instead.
+
+The Starter Kit's `Title.razor` uses this attribute to bind its page-title query.
 
 ## Templates
 

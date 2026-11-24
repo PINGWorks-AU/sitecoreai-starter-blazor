@@ -6,13 +6,20 @@ This repository contains a Blazor starter kit for SitecoreAI development. Fork t
 
 The runtime uses Sitecore's GraphQL endpoints and the Admin API to get content and actively monitor the site for updates. AppSettings specify the site and synchronisation engine settings. By default the runtime will cache content into a path on the local disk to improve performance and reduce load on the Sitecore Edge, but this can be disabled if you prefer.
 
-The runtime uses the Admin API to automatically create a webhook with the `OnUpdate` execution mode to evict the local cache when pages are published in Sitecore. The webhook receiver registers a default route of `webhook/ee` for the `POST` method - be careful not to overlap this with a path in your public-facing application. The path can be changed through AppSettings if required.
+The runtime uses the Admin API to automatically create a webhook with the `OnUpdate` execution mode to evict the local cache when pages are published in Sitecore. The webhook receiver registers a default route of `/api/webhooks/publish` for the `POST` method - be careful not to overlap this with a path in your public-facing application. The path can be changed through AppSettings (`SitecoreSettings:WebhookPath`) if required.
 
 ## Hosting
 
 This approach uses a custom rendering host for SitecoreAI, and does not rely on the deployment processes built into Sitecore, nor is there any dependency on Vercel. The simplest approach is to publish your environment to an Azure App Service.
 
 Runtime components of the Blazor rendering host connect to Sitecore via GraphQL and API services, and therefore require sensitive keys to be added to configuration files, and uses the file system for caching. For these reasons **you should not use a Blazor WebAssembly app as a rendering host** since all content will be accessible to visitors in their browser, and you will need a .NET runtime based hosting environment (either Windows or Linux) rather than simple flat-file hosting.
+
+The SDK supports production hosting concerns out of the box:
+
+- **Readiness probe** - `GET /api/health/ready` returns `503` until the site has loaded; point your platform's readiness or health check at it. See [Health and readiness](/docs/health.md).
+- **Reverse proxies** - forwarded headers are handled for you; don't call `app.UseForwardedHeaders()` yourself. See [Hosting behind a proxy](/docs/hosting.md).
+- **Multiple instances** - with a shared volume (e.g. `/home` on Linux App Service) a publish clears the cache on every instance. See [Caching and content sync](/docs/caching-sync.md#multi-instance-cache-coordination).
+- **Application Insights** - set `APPLICATIONINSIGHTS_CONNECTION_STRING` to turn on browser telemetry, proxied through your own site. See [Application Insights](/docs/app-insights.md).
 
 While the rendering app itself is a server-side application, individual interactive components can still be rendered in WASM mode if desired. The application default rendering mode is SSR - static server rendering with enhanced navigation.
 

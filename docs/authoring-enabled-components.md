@@ -33,7 +33,7 @@ Each component's `Field` parameter is typed to a field from the `PINGWorks.Sitec
 | Component       | HTML rendered                                   | `Field` parameter type                   |
 | --------------- | ----------------------------------------------- | ---------------------------------------- |
 | `ScDate`        | formatted text                                  | `…ContentSDK.Fields.DateTimeField`       |
-| `ScNumber`      | formatted text                                  | `…ContentSDK.Fields.DecimalField`        |
+| `ScNumber`      | formatted text                                  | `…ContentSDK.Fields.INumericField`       |
 | `ScFile`        | `<a />`                                         | `…ContentSDK.Fields.Sitecore.FileField`  |
 | `ScLink`        | `<a />`                                         | `…ContentSDK.Fields.HyperlinkField`      |
 | `ScImage`       | `<img />`                                       | `…ContentSDK.Fields.Sitecore.ImageField` |
@@ -76,6 +76,8 @@ Renders an image (`<img />`).
   Sizes="[string?]" SrcSet="[IReadOnlyList<IReadOnlyDictionary<string, object?>>?]"
 />
 ```
+
+Any other attribute you add (e.g. `loading="lazy"`, `data-*`, `aria-*`) is passed through to the `<img />` element.
 
 Of note, `ImageParams` is expected to be an anonymous object that provides properties to Sitecore used in rendering, e.g. `new { mw = 200 }`. These are also applied to each element in a SrcSet, but the SrcSet property allows overriding them.
 
@@ -129,19 +131,19 @@ Renders an anchor (`<a />`). The label of the anchor will be the content of the 
 ></ScLink>
 ```
 
-Any parameter you supply takes precedence over the corresponding value on the field. Provide `ChildContent` (the element body) to render custom markup in place of the field's text.
+Any parameter you supply takes precedence over the corresponding value on the field. Any other attribute you add (e.g. `data-*`, `aria-*`, `id`) is passed through to the `<a />` element. Provide `ChildContent` (the element body) to render custom markup in place of the field's text.
 
 ## ScNumber
 Renders a numeric value or nothing.
 
 ```html
-<ScNumber Field="[DecimalField]" Editable="[bool=true]"
+<ScNumber Field="[INumericField]" Editable="[bool=true]"
   Culture="[string?]"
   NumberFormat="[string?]"
 />
 ```
 
-`NumberFormat` is a standard or custom .NET numeric format string.
+`Field` accepts any `INumericField`, so both `DecimalField` and `IntegerField` work. `NumberFormat` is a standard or custom .NET numeric format string. In the Pages editor an empty field shows `[No text in field]` so authors can click into it.
 
 ## ScPlaceholder
 Renders each Sitecore component placed inside the named placeholder, in the order they were authored.
@@ -167,3 +169,5 @@ Renders the Sitecore Field value as escaped text, or nothing. When `ConvertNewLi
   ConvertNewLines="[bool=true]"
 />
 ```
+
+In the Pages editor an empty field shows `[No text in field]` so authors can click into it and add a value.

@@ -43,5 +43,5 @@ The `UI` folder follows a simple location convention but you do not need to foll
 | `Pages/` | Pages reached through explicit Blazor routes (`@page`), which override Sitecore's fallback route. The Starter Kit ships with `Status.razor` for error pages; the SDK contributes the built-in [Tools page](tools.md) at `/.tools`. |
 | `Templates/` | Blazor components mapped to Sitecore page templates. `Page.razor` is the default and is selected when no template-specific component is found. |
 | `App.razor` | The root document used for every request. See [Routing](routing.md). |
-| `Routes.razor` | Hosts the SDK's `<SitecoreRouter>` and the `MainLayout` default. |
+| `Routes.razor` | Hosts the SDK's `<SitecoreRouter>` with the `MainLayout` default and the `Status` not-found page. |
 | `_Imports.razor` | Pulls in the namespaces every component file relies on, including the SDK's `Components`, `Binding`, `Data` and `Services` namespaces. |

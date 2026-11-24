@@ -18,9 +18,11 @@ This section configures how your application talks to Sitecore Experience Edge, 
 | `EnvironmentHostName` | string? | `null` | The authoring environment hostname (e.g. `xmc-example-dev.sitecorecloud.io`). Required when editing is enabled so the SDK can build absolute callback URLs. |
 | `DefaultLanguage` | string | `"en"` | Two-letter or culture code used when no other language can be resolved for a request. Always implicitly allowed. |
 | `AllowedLanguages` | List&lt;string&gt; | `[]` | Additional language or culture codes that the site should accept. Pre-loaded at startup. See [Multi-language support](multi-language.md). Values are case-sensitive and passed verbatim to Sitecore Edge. |
+| `AllowPageIdLookup` | bool | `false` | Allows pages to be requested by item id (`/?pageId={guid}`) on public hosts. Editing hosts (`EnableEditingMode = true`) always allow it. See [Pages, Templates and Components](components.md). |
 | `DefaultPageTemplate` | string | `"Page"` | Name of the Sitecore template used by default when no matching template-mapped Blazor component is found. |
 | `AuthoringHosts` | IReadOnlyList&lt;string&gt; | `[]` | Additional hosts that should be permitted by CORS, typically the public hostnames you use to author the site. |
 | `EditingOrigins` | List&lt;string&gt; | Sitecore Pages, Design Library | Origins allowed by the editing CORS policy. The defaults cover Sitecore Pages and Design Library; add to this list only if you have custom authoring tooling. |
+| `ForwardedAllowedHosts` | List&lt;string&gt; | `[]` | Host names accepted from the `X-Forwarded-Host` header, e.g. `[ "www.example.com" ]`. When empty, any forwarded host is accepted. See [Hosting behind a proxy](hosting.md). |
 | `EditingCorsPolicyName` | string | `"AllowSitecoreEditing"` | Name of the CORS policy registered when editing is enabled. Rarely changed. |
 | `EditingConfigPackages` | IReadOnlyDictionary&lt;string,string&gt; | Content SDK defaults | Optional list of npm packages and versions returned in the editing handshake payload. The defaults advertise Content SDK compatibility so Design Studio recognises the head. Override to track a specific Content SDK version. |
 | `DesignStudio` | DesignStudioSettings | _see below_ | Settings for Design Studio code-extraction and upload support. |
@@ -29,8 +31,9 @@ This section configures how your application talks to Sitecore Experience Edge, 
 | `EditingPath` | string | `"/api/editing/config"` | Path for the editing handshake endpoint. Mirrors the `ServerSideRenderingEngineConfigUrl` value on the Default Rendering Host item. |
 | `RenderingPath` | string | `"/api/editing/render"` | Path for the editing render callback. |
 | `GetTrackingTokenPath` | string | `"/api/token"` | Path for the analytics tracking token endpoint. |
+| `ReadinessPath` | string | `"/api/health/ready"` | Path for the readiness probe endpoint. See [Health and readiness](health.md). |
 | `CacheResetPath` | string | `"/api/cache-reset"` | Path for the remote cache-reset endpoint. |
-| `CacheResetApiKey` | string? | `null` | API key required in the `x-apikey` header for calls to the cache-reset endpoint. Leave `null` to disable the endpoint. |
+| `CacheResetApiKey` | string? | `null` | API key required in the `x-apikey` header for calls to the cache-reset endpoint. When `null` the endpoint accepts every caller, so set it wherever the endpoint is reachable. |
 | `AuthorizationPolicyFieldName` | string | `"_AccessPolicy"` | Route-level field the SDK reads a page's authorization policy name from. Set to an empty string to disable [page-level security](page-security.md). |
 | `AuthorizationPolicyFailedRedirect` | string | `"/status-403"` | Where a visitor who fails a page's policy is redirected. Falls back to `/` if left blank. See [page-level security](page-security.md). |
 | `PathAccessControl` | IReadOnlyList&lt;PathAccessRule&gt; | `[]` | IP allow-listing per URL path prefix. Empty by default; add a rule restricting `/.tools` to loopback at a minimum. |
@@ -85,7 +88,7 @@ Settings for the built-in Tools page at `/.tools`.
 | Property | Type | Default | Description |
 | - | - | - | - |
 | `TrackCacheStatistics` | bool | `true` | Record a lightweight key + timestamp index so the Cache tool can list in-memory items. Set `false` on memory-sensitive hosts to switch it off. |
-| `CacheToolsReadOnly` | bool | `false` | Make the Tools page view-only: hide and disable every write action across all tabs - the Cache tab's **Delete** / **Clear** / **Clear log**, the Edge Webhooks **Delete**, and the Edge Settings **Save** / **Clear tenant cache**. |
+| `CacheToolsReadOnly` | bool | `false` | Make the Tools page view-only: hide and disable every write action across all tabs - the Cache tab's **Delete** / **Clear** / **Clear log**, the Page URLs **Reload from Sitecore**, the Edge Webhooks **Delete**, and the Edge Settings **Save** / **Clear tenant cache**. |
 
 ## SyncSettings
 
@@ -99,7 +102,21 @@ The SDK keeps an in-process and on-disk cache of layout responses fetched from S
 | `MemoryCacheTimeout` | TimeSpan | `01:00:00` | Lifetime for in-memory cache entries. |
 | `StorageCacheTimeout` | TimeSpan | `1.00:00:00` | Lifetime for on-disk cache entries. _Note:_ the JSON property `DiskCacheTimeout` is also accepted for backwards compatibility. |
 | `PreloadPaths` | IReadOnlyList&lt;string&gt; | `[ "/" ]` | URL paths to fetch and cache at startup so the first user request is already warm. |
+| `MaxConcurrentLayoutRequests` | int | `8` | Most layout requests sent to Experience Edge at once for pages not in the cache. |
+| `LayoutRequestQueueTimeout` | TimeSpan | `00:00:10` | How long an uncached page waits for a layout request slot before it is served as not found. |
 | `ChangeFeed` | ChangeFeedSettings? | `null` | Nested settings that wire the SDK into Sitecore Edge's publishing webhook for automatic cache invalidation. Omit to disable. |
+| `CrossInstance` | CrossInstanceSettings? | `null` | Nested settings that coordinate cache clears across multiple instances through a shared volume. Omit for a single instance. See [Caching & content sync](caching-sync.md#multi-instance-cache-coordination). |
+
+### SyncSettings.CrossInstance
+
+Coordinates cache clears across load-balanced instances through a signal file on a shared volume. Opt-in: omit the section, or set `PollInterval` to zero, to leave each instance independent. See [Caching and content sync](caching-sync.md#multi-instance-cache-coordination) for how it works.
+
+| Property | Type | Default | Description |
+| - | - | - | - |
+| `SharedPath` | string | _required_ | Directory on a volume shared by every instance (e.g. a mounted Azure Files share) that holds the cache-clear signal file. |
+| `PollInterval` | TimeSpan | `00:00:10` | How often each instance checks the signal file for a newer cache-clear token. Set to `00:00:00` to turn coordination off without removing the section. |
+| `InstanceId` | string? | machine name | Identifies the originating instance in the signal file and the cache-clear log. |
+| `SignalFileName` | string | `"cache-signal.json"` | Name of the signal file within `SharedPath`. Give each app its own name when several apps share one storage account. |
 
 ### SyncSettings.ChangeFeed
 
@@ -109,8 +126,8 @@ The SDK keeps an in-process and on-disk cache of layout responses fetched from S
 | `ClientSecret` | string | _required_ | Edge API (administration) client secret. Treat as a secret. |
 | `WebhookReceiverBase` | Uri | _required_ | The publicly-reachable base URL of this application. The SDK appends `WebhookPath` to this when registering itself with Edge. |
 | `AutoCreateEdgeWebhook` | bool | `false` | When `true`, the SDK uses the supplied credentials to register the publish webhook with Sitecore Edge on startup. Set to `false` if you manage webhook registration outside the application. _Note:_ turning this off does not stop the credentials being used - they still power the Edge Webhooks and Edge Settings tools whenever they're supplied. |
-| `WebhookApiKey` | string? | `null` | Optional shared secret. When set, incoming publish webhook calls must present this key in the `x-apikey` header. |
-| `UniqueId` | string? | `null` | Optional identifier used to disambiguate multiple environments sharing the same Edge tenant. Also the label the SDK stamps on the webhook it auto-creates (falling back to the machine name). |
+| `WebhookApiKey` | string? | `null` | Shared secret that incoming publish webhook calls must present in the `x-apikey` header. When blank and `AutoCreateEdgeWebhook` is `true`, the SDK generates a random key at startup and registers the webhook with it. |
+| `UniqueId` | string? | machine name | Label the SDK stamps on the webhook it auto-creates, for identification. When blank, the machine name is used. Environments sharing one Edge tenant are kept apart by their `WebhookReceiverBase`, not this label. |
 | `CacheClearDebounceSecs` | int | `30` | Window during which repeated publish notifications are coalesced into a single cache clear. |
 
 > [!NOTE]

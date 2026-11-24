@@ -26,7 +26,7 @@ This capability is built into the Blazor SDK itself and works regardless of whic
 /?pageId={id}
 ```
 
-The SDK loads that page in a **single** request to Experience Edge, renders it in place, and rewrites the address bar to the page's friendly URL - with **no HTTP redirect**, under both static SSR and interactive rendering. Full route allow-listing and [page-level authorization](page-security.md) still apply. See [Loading a page by id](components.md#loading-a-page-by-id) for the complete behaviour and the rules that govern it.
+The SDK loads that page in a **single** request to Experience Edge, renders it in place, and rewrites the address bar to the page's friendly URL - with **no HTTP redirect**, under both static SSR and interactive rendering. Full route allow-listing and [page-level authorization](page-security.md) still apply. On public hosts this needs `SitecoreSettings.AllowPageIdLookup` set to `true`; editing hosts always allow it. See [Loading a page by id](components.md#loading-a-page-by-id) for the complete behaviour and the rules that govern it.
 
 This means a results list can render a hit with nothing more than its id:
 

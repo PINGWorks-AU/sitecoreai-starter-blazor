@@ -15,9 +15,9 @@ These are first-class features of the Blazor SDK with no direct equivalent (or o
 - **End-to-end C# / Blazor** - components, models, field binding and server logic in one strongly-typed language. No JS/TS, no separate Node rendering host, no dual build pipeline. The Content SDK is React/Next.js only.
 - **Built-in two-layer content cache** - an in-process **memory + disk** cache of Edge layout responses, with publish-webhook-driven invalidation, optional on-disk compression, and start-up preloading. The site stays fast under load and keeps serving content even if Edge is briefly unavailable. The Content SDK leans on the hosting platform (e.g. Next.js/Vercel ISR and edge caching) for this. See [Caching and content sync](/docs/caching-sync.md).
 - **Page-level security** - content authors mark any page with a named **authorization policy** that maps to a standard ASP.NET Core policy, evaluated per request against the signed-in user - fully compatible with the shared layout cache. See [Page-level security](/docs/page-security.md).
-- **Built-in operational Tools page** - an in-app `/.tools` surface with a live **cache inspector** (browse, delete and clear memory/disk items, review a cache-clear event log), a **page layout viewer**, an **Edge webhook manager**, an **Edge settings editor**, and a **pluggable tab architecture** so you can add your own diagnostic tools.
+- **Built-in operational Tools page** - an in-app `/.tools` surface with a live **cache inspector** (browse, delete and clear memory/disk items, review a cache-clear event log), a **page URL and redirect browser**, a **page layout viewer**, an **Edge webhook manager**, an **Edge settings editor**, and a **pluggable tab architecture** so you can add your own diagnostic tools.
 - **Server-side form-submission handling** - an extensible pipeline (`IFormProcessor`) that runs your code when a Sitecore Forms submission arrives, fanning a single form out to multiple handlers, with ready-made processors for save-to-disk, email and Microsoft Teams. Both SDKs render Sitecore-authored forms, but Sitecore's headless SDKs leave what-to-do-with-the-data to Sitecore's Forms API or your own custom endpoint. See [Forms](/docs/forms.md).
-- **Standard ASP.NET Core hosting** - runs as an ordinary .NET app on Azure App Service or Container Apps, with the full ASP.NET Core middleware ecosystem and no proprietary host lock-in.
+- **Standard ASP.NET Core hosting** - runs as an ordinary .NET app on Azure App Service or Container Apps, with the full ASP.NET Core middleware ecosystem and no proprietary host lock-in. Built-in [readiness probe](/docs/health.md), [reverse-proxy handling](/docs/hosting.md), [multi-instance cache coordination](/docs/caching-sync.md#multi-instance-cache-coordination) and first-party-proxied [Application Insights](/docs/app-insights.md) browser telemetry.
 - **Page by id** - for those circumstances when you only have an ItemId (e.g. search results) the SDK has a built-in resolver URL for loading pages by ID. Full security restrictions are still applied.
 
 > [!TIP]
@@ -64,6 +64,12 @@ The Content SDK has the following capabilities that the Blazor SDK does not yet 
 1. [Analytics and tracking](/docs/analytics-tracking.md)
 1. [Search](/docs/search.md)
 
+### Hosting and operations
+
+1. [Hosting behind a proxy](/docs/hosting.md)
+1. [Health and readiness](/docs/health.md)
+1. [Application Insights](/docs/app-insights.md)
+
 ### Security
 
 1. [IP and path access control](/docs/ip-path-security.md)
@@ -73,6 +79,7 @@ The Content SDK has the following capabilities that the Blazor SDK does not yet 
 
 1. [The Tools page](/docs/tools.md)
 1. [Cache inspection](/docs/tools-cache.md)
+1. [Page URLs](/docs/tools-routes.md)
 1. [GraphQL Viewer](/docs/tools-graphql.md)
 1. [Edge Webhooks](/docs/tools-webhooks.md)
 1. [Edge Settings](/docs/tools-edge-settings.md)

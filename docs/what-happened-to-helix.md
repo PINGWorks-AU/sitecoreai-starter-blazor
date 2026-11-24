@@ -36,7 +36,7 @@ Even though we don't build our rendering system on top of Helix, vestiges of it 
 In Helix terms, our entire implementation is effectively a set of **Project Modules**. The website project composes features into a working site; it does not try to reproduce the Foundation / Feature / Project separation in code. The roles that Foundation and Feature layers used to play are now filled by:
 
 - the **Blazor SDK** (`PINGWorks.SitecoreAI.BlazorSDK`), which provides the stable, reusable plumbing a Foundation layer once did - routing, model binding, field components, caching, editing, analytics, and
-- **companion projects** where genuine reuse or complexity justifies them, for example a custom integration SDK or a library of shareable business logic.
+- **companion projects** where genuine reuse or complexity justifies them, for example the generated GraphQL client (see [Working with GraphQL](graphql.md)), a custom integration SDK, or a library of shareable business logic.
 
 ## Practical guidance
 

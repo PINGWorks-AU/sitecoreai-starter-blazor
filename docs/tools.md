@@ -1,7 +1,7 @@
 # The Tools page
 [&lt; Docs index](index.md)
 
-The SDK ships a built-in **Tools page** at `/.tools` — a container for developer and operations tools that run inside your live application, with access to its real services and caches. Today it hosts the [Cache inspection tool](tools-cache.md), the [GraphQL Viewer](tools-graphql.md), the [Edge Webhooks](tools-webhooks.md) manager and the [Edge Settings](tools-edge-settings.md) editor; more tools will be added here over time.
+The SDK ships a built-in **Tools page** at `/.tools` — a container for developer and operations tools that run inside your live application, with access to its real services and caches. It hosts the [Cache inspection tool](tools-cache.md), the [Page URLs](tools-routes.md) viewer, the [GraphQL Viewer](tools-graphql.md), the [Edge Webhooks](tools-webhooks.md) manager and the [Edge Settings](tools-edge-settings.md) editor.
 
 ## Access
 
@@ -22,7 +22,7 @@ The `SitecoreSettings.Tools` section configures the Tools page:
 | Property | Type | Default | Description |
 | - | - | - | - |
 | `TrackCacheStatistics` | bool | `true` | When `true`, the caching layer records a lightweight key + timestamp index so the Cache tool can list in-memory items. Set `false` on memory-sensitive hosts to switch the tracking off entirely. See [Cache inspection](tools-cache.md). |
-| `CacheToolsReadOnly` | bool | `false` | When `true`, the Tools page is view-only: every destructive action (item **Delete**, cache **Clear**, **Clear log**) is hidden and disabled. Use this in shared or production-adjacent environments where you want visibility without the ability to mutate the cache. |
+| `CacheToolsReadOnly` | bool | `false` | When `true`, the Tools page is view-only: every destructive action (item **Delete**, cache **Clear**, **Clear log**, **Reload from Sitecore**) is hidden and disabled. Use this in shared or production-adjacent environments where you want visibility without the ability to mutate the cache. |
 
 > [!NOTE]
 > `CacheToolsReadOnly` is enforced both in the UI (the buttons don't render) and in the service layer (the operations no-op), so it can't be bypassed by crafting a request directly.
@@ -34,10 +34,10 @@ Each tool is a **tab** on the page. The page itself owns no tab list — it asks
 | Tool | Status | What it does |
 | - | - | - |
 | [Cache](tools-cache.md) | Available | Inspect, delete and clear the memory / disk cache; review the cache-clear event log. |
+| [Page URLs](tools-routes.md) | Available | Browse the site's page URLs and redirects per language; reload the site map from Sitecore. |
 | [GraphQL](tools-graphql.md) | Available | Inspect the raw Edge layout JSON for any page, with a placeholder / component / item tree to navigate it. |
 | [Edge Webhooks](tools-webhooks.md) | Available | List, inspect and remove the publish webhooks registered against the Sitecore environment. |
 | [Edge Settings](tools-edge-settings.md) | Available | View and update the Edge tenant's cache settings; clear the tenant cache. |
-| Design Studio | Planned | _placeholder_ |
 
 ## Writing your own tab
 
@@ -80,11 +80,12 @@ builder.Services.AddSingleton<IToolsTab, DiagnosticsTab>();
 It now appears on `/.tools` automatically, in nav order of registration, grouped by `Group`. Inactive tabs stay rendered but hidden, so each tab keeps its state as you switch between them.
 
 > [!NOTE]
-> The built-in tabs (Cache, GraphQL, Edge Webhooks and Edge Settings, plus the planned Design Studio placeholder) are registered by the SDK exactly this way — there's no privileged code path. Your tabs are first-class citizens alongside them.
+> The built-in tabs (Cache, Page URLs, GraphQL, Edge Webhooks and Edge Settings) are registered by the SDK exactly this way — there's no privileged code path. Your tabs are first-class citizens alongside them.
 
 ## Related
 
 - [Cache inspection](tools-cache.md) — the first tool.
+- [Page URLs](tools-routes.md) — browse page URLs and redirects per language.
 - [GraphQL Viewer](tools-graphql.md) — inspect the raw layout JSON for any page.
 - [Edge Webhooks](tools-webhooks.md) — list and remove publish webhooks.
 - [Edge Settings](tools-edge-settings.md) — view/update Edge tenant cache settings.

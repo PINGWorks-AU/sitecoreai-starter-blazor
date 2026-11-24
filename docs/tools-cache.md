@@ -12,7 +12,7 @@ The Usage tab shows the current cache configuration — the [`SyncSettings.Cachi
 - **Memory** — the process memory load against the memory available to the host (read from the GC), so you can see how much headroom the container has.
 - **Disk** — the size of the on-disk cache directory against the free space on its drive.
 
-A **Refresh** button (top right, next to **Clear**) re-reads everything.
+A **Refresh** button (top right, next to **Clear**) re-reads everything, including the Events log.
 
 ## Data
 
@@ -41,7 +41,7 @@ Both actions are hidden when `SitecoreSettings.Tools.CacheToolsReadOnly` is `tru
 Every cache clear and item delete is recorded to an **event log**, so you can see *why* the cache emptied — a publish, a manual reset, an API call. The Events tab renders the log as a table of:
 
 - **Time** — when it happened. A **GMT / Local time** switch toggles between UTC and your browser's local zone (rendered with the Blok `LocalTime` component, which formats in the visitor's time zone rather than the server's).
-- **Source** — what triggered it: `Webhook` (a publish notification), `Api` (the cache-reset endpoint), `Tools` (this page), or `External` (a direct `ICacheEvictor` call in your own code).
+- **Source** — what triggered it: `Webhook` (a publish notification), `Api` (the cache-reset endpoint), `Tools` (this page), `External` (a direct `ICacheEvictor` call in your own code), or `CrossInstance` (a clear signalled by another instance through [multi-instance coordination](caching-sync.md#multi-instance-cache-coordination)).
 - **Scope** — whether it cleared all items or a single one.
 - **Item key** — recorded for single-item deletes.
 

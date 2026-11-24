@@ -23,6 +23,8 @@ $stream = [System.IO.MemoryStream]::new($bytes)
 
 Send the hash value, and whether you are using it in a production or non-production context and we'll send you back a license file. The file should live in the root of your Blazor project (alongside `Program.cs`), and should be marked as `CopyToOutputDirectory=Always`.
 
+If the license check fails at startup, the SDK logs a critical error and stops the application.
+
 ## Update names and properties
 
 Update the following items to suit your project:
@@ -151,6 +153,7 @@ If you don't want to use the Blazor template included in the Starter Kit, there'
     1. After `.AddInteractiveServerRenderMode( ... )` you must call `.AddAdditionalAssemblies( typeof( SitecorePage ).Assembly )` which makes the routes and components from the SDK available to the application
     1. Register middleware and routes with `app.UseSitecoreBlazorSDK()` after `MapRazorComponents<App>()`
     1. Add `app.UseRequestLocalization()` before `UseAntiforgery()` so the SDK's language resolver runs on every request
+    1. Do not call `app.UseForwardedHeaders()` - `AddSitecoreBlazorSDK()` already applies forwarded-headers handling at the start of the pipeline, and a second pass consumes an extra `X-Forwarded-For` entry. See [Hosting behind a proxy](hosting.md)
 1. Set up error pages with `app.UseStatusCodePagesWithReExecute( "/status-{0}", createScopeForStatusCodePages: true )` and an exception handler that re-executes to the same route (see [Error handling](error-handling.md))
 1. Update settings as described above
 1. In `App.razor` add the following section outlets after `<HeadOutlet />`:
@@ -160,7 +163,7 @@ If you don't want to use the Blazor template included in the Starter Kit, there'
 1. In `App.razor` add the following section outlets before the end body tag `</body>`:
     1. `<SectionOutlet SectionName="ScriptLayout" />`
     1. `<SectionOutlet SectionName="ScriptPage" />`
-1. Replace the standard `<Router>` in `Routes.razor` with the SDK's `<SitecoreRouter>` so that unmatched URLs fall through to Sitecore content
+1. Replace the standard `<Router>` in `Routes.razor` with the SDK's `<SitecoreRouter>` so that unmatched URLs fall through to Sitecore content and page views are tracked
 1. In `MainLayout.razor` (the layout used for all Sitecore pages), add a section content as follows:
     ```html
     <SectionContent SectionName="HeadLayout">

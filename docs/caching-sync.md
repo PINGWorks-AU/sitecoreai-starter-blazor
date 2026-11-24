@@ -29,6 +29,18 @@ When the application starts, the SDK's content sync engine runs before the site 
 
 The site map load is the reason `AllowedLanguages` matters for performance: each language is loaded and preloaded independently, so listing only the languages you actually serve keeps startup lean.
 
+Until the site map and initial sync are loaded, the readiness endpoint (`/api/health/ready`) returns `503`, so a container platform can keep a starting instance out of rotation. See [Health and readiness](health.md).
+
+## Redirects, robots.txt and sitemap.xml
+
+Redirects and robots data come from the site map, so they are cached with it and refresh whenever the site map is rebuilt after a publish. The redirect lookup for each site is built once per site map load. `/sitemap.xml` is fetched from Edge on demand and held in memory for 5 minutes.
+
+## Uncached page requests
+
+Only paths that are routes of the site reach Experience Edge; any other path is rejected with a single lookup. Pages not in the cache are fetched with at most `SyncSettings.MaxConcurrentLayoutRequests` (default `8`) Edge requests at once. A request that waits longer than `SyncSettings.LayoutRequestQueueTimeout` (default 10 seconds) for a slot is served as not found.
+
+When Edge returns no layout for a route or item id, the miss is remembered for 2 minutes (up to 10,000 misses) and forgotten on the next cache clear, so repeat requests for it don't reach Edge.
+
 ## Staying fresh: the publish webhook
 
 Content changes in Sitecore are published to Experience Edge. To learn about those publishes, the SDK registers a **webhook** with Edge and exposes a receiver endpoint (default `/api/webhooks/publish`). The flow is:
@@ -40,7 +52,7 @@ Content changes in Sitecore are published to Experience Edge. To learn about tho
 
 ### Registering the webhook automatically
 
-If `SyncSettings.ChangeFeed.AutoCreateEdgeWebhook` is `true`, the SDK uses the `ChangeFeed.ClientId` / `ClientSecret` credentials to register the webhook with Edge on startup, pointing it at `ChangeFeed.WebhookReceiverBase` + the publish path. It removes any existing webhook with the same label first, so restarts don't accumulate duplicates. The label is derived from `ChangeFeed.UniqueId` (or the machine name when that's not set), which is how multiple environments sharing one Edge tenant keep their webhooks distinct.
+If `SyncSettings.ChangeFeed.AutoCreateEdgeWebhook` is `true`, the SDK uses the `ChangeFeed.ClientId` / `ClientSecret` credentials to register the webhook with Edge on startup, pointing it at `ChangeFeed.WebhookReceiverBase` + the publish path. On startup it first removes every existing webhook that targets that same receiver URL, then creates one, so duplicates can't accumulate - including webhooks left behind by instances that have since been recycled. Each webhook is labelled from `ChangeFeed.UniqueId` (or the machine name when that's not set) for identification; environments that share one Edge tenant stay distinct because each has its own `WebhookReceiverBase`.
 
 Set `AutoCreateEdgeWebhook` to `false` if you'd rather manage webhook registration yourself (for example through infrastructure-as-code).
 
@@ -49,7 +61,30 @@ Set `AutoCreateEdgeWebhook` to `false` if you'd rather manage webhook registrati
 
 ### Securing the receiver
 
-Set `ChangeFeed.WebhookApiKey` to require an `x-apikey` header on incoming publish notifications. When `AutoCreateEdgeWebhook` is on, the SDK configures Edge to send this header, so the two stay in step automatically.
+Set `ChangeFeed.WebhookApiKey` to require an `x-apikey` header on incoming publish notifications. When `AutoCreateEdgeWebhook` is on, the SDK configures Edge to send this header, so the two stay in step automatically. If `AutoCreateEdgeWebhook` is on and no key is set, the SDK generates a random key at startup and registers the webhook with it.
+
+## Multi-instance cache coordination
+
+Behind a load balancer, a publish webhook reaches only the one instance the balancer routes it to. That instance clears its cache, but the others would keep serving stale in-memory content until their `MemoryCacheTimeout` elapses. `SyncSettings.CrossInstance` closes that gap with a small signal file on a volume every instance shares (on Linux App Service `/home` is already an Azure Files share mounted across all instances):
+
+1. The instance that handles a clear - from the publish webhook, the cache-reset endpoint, or the Tools page - rebuilds its cache, stamps the new token into its own `DataPath`, and writes the same token to the signal file in `CrossInstance.SharedPath`.
+2. Every instance polls that file every `CrossInstance.PollInterval` (default 10 seconds).
+3. When an instance sees a token it hasn't seen before it refreshes, recorded with a `CrossInstance` source in the cache-clear log, and does not re-write the signal, so it doesn't bounce between instances. How it refreshes adapts automatically: if the token stamped in the instance's own `DataPath` already matches the signal, that `DataPath` is the same shared volume a peer has already rebuilt, so the instance only drops its in-memory caches and reloads the rebuilt site map from it - no Edge queries. If the tokens differ, the instance's cache does not hold the publish (a local `DataPath`), so it rebuilds from Edge. On a large site, where the route list is many GraphQL requests, only one instance rebuilds from Edge per publish when the cache is shared.
+
+```json
+{
+  "SyncSettings": {
+    "CrossInstance": {
+      "SharedPath": "/home/site/wwwroot/appdata/Sync",
+      "PollInterval": "00:00:10"
+    }
+  }
+}
+```
+
+Only the signal and the generation token are written to coordinate; the cache itself is written atomically (a temp file renamed into place) and its clear tolerates files other instances hold open, so a cache shared between instances never yields a torn read. On startup an instance adopts the current token without clearing, since it has just loaded fresh content. Coordination is opt-in: omit the `CrossInstance` section, or set `PollInterval` to `00:00:00`, to leave each instance independent.
+
+`SharedPath` is set per environment - for example `/home/site/wwwroot/appdata/Sync` on Linux App Service and `c:\home\appdata\Sync` on Windows. Give each app its own `SignalFileName` when several share one storage account. See [Configuration settings](settings.md#syncsettingscrossinstance) for every property.
 
 ## Reacting to a cache clear in your own code
 
@@ -73,7 +108,7 @@ You can also clear the cache — and inspect what's in it — interactively from
 
 ## Extending the cache
 
-The storage layers sit behind interfaces - `ICacheStorageAdapter` for layout responses and `ISitesStorageAdapter` for the site map - and eviction behind `ICacheEvictor`. The defaults (file-backed storage, a global evictor) suit most sites, but you can register your own implementations in DI if you need, for example, a distributed cache shared across instances.
+The storage layers sit behind interfaces - `ICacheStorageAdapter` for layout responses and `ISitesStorageAdapter` for the site map - and eviction behind `ICacheEvictor`. The defaults (file-backed storage, a global evictor) suit most sites, but you can register your own implementations in DI if you need a different store, for example a distributed cache.
 
 ## Next steps
 

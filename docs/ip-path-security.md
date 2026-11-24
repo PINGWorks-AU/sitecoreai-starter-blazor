@@ -47,7 +47,7 @@ When more than one rule matches a request, the **longest** matching prefix gover
 
 This is the part that catches people out. When the app runs behind a reverse proxy — Azure Container Apps, App Service on Linux, an ingress controller — the host sees **every** connection as coming from the proxy (typically `127.0.0.1` or a private address), not the real visitor. An IP allow-list compared against that would either allow everyone or no-one.
 
-The real client IP arrives in the `X-Forwarded-For` header. `UseSitecoreBlazorSDK()` registers ASP.NET Core's forwarded-headers middleware for you, so the SDK compares the allow-list against the **originating** client IP rather than the proxy. The middleware is configured to trust the forwarded headers, because the container ingress IP can't be known ahead of time.
+The real client IP arrives in the `X-Forwarded-For` header. `AddSitecoreBlazorSDK()` runs ASP.NET Core's forwarded-headers middleware at the start of the request pipeline for you (see [Hosting behind a proxy](hosting.md)), so the SDK compares the allow-list against the **originating** client IP rather than the proxy. The middleware is configured to trust the forwarded headers, because the container ingress IP can't be known ahead of time.
 
 > [!NOTE]
 > Because the **forwarded** client IP is what's checked, the default loopback rule on `/.tools` does not accidentally expose the page through the proxy — a real external visitor presents their own public IP, not the proxy's loopback address. Depending on configuration, it may still be possible for a determined attacker to spoof the necessary headers. Test in your own environment or disable the page on public-facing systems for protection by removing all allowed IPs from the rule.

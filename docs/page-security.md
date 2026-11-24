@@ -30,7 +30,6 @@ Register policies with the standard ASP.NET Core `AddAuthorization()` call. The 
 
 ```csharp
 builder.Services
-    .AddAntiforgery()
     .AddSitecoreBlazorSDK( builder.Configuration )
     .AddAuthorization( opts => {
         // Names must match the items under Settings/Authorization Policies in Sitecore.

@@ -71,6 +71,7 @@ https://yoursite/?pageId=c6321f45-2f83-4b09-af1a-f2f12fdb0732
 
 A few rules govern the behaviour:
 
+- **It is off on public hosts by default.** Loading by id is always available when `SitecoreSettings.EnableEditingMode` is `true`. On public hosts set `SitecoreSettings.AllowPageIdLookup` to `true` to turn it on; while it is off the `pageId` parameter is ignored and the request is handled by its path.
 - **A route path always wins.** `pageId` is only consulted when the request has no route path (i.e. the root `/`). If both are present, the path is used and `pageId` is ignored.
 - **The site's route allow-list still applies.** The resolved page must belong to the current site, exactly as for a directly-requested URL. A page that the site does not serve resolves to the standard not-found page.
 - **Page-level [authorization policies](page-security.md) still apply.** Loading by id is not a way around page security - the resolved page is authorised the same way a direct URL would be.

@@ -26,6 +26,8 @@ A cookie enables tracking only when its value is exactly `"1"`. When consent is 
 - `Analytics.EventsCookie` (default name `sc_cid`) holds the browser context id used for events.
 - `Analytics.ProfileCookie` (default name `sc_cid_personalize`) holds the guest profile id.
 
+Each identifier is tied to its own consent: a browser context id is issued only with event consent, and a guest profile id only with profile consent. Granting one does not issue the other.
+
 If `Analytics.Enabled` is `false`, nothing is tracked regardless of cookies. This is the master kill-switch.
 
 The Starter Kit ships a `CookieConsent.razor` component that shows a preferences panel until the visitor has made a choice, and an accompanying `CookieConsent.razor.js` that writes the consent cookies. Use it as-is or replace it with your own consent UI - all the SDK cares about is the cookie values.
@@ -70,7 +72,7 @@ All parameters after the first are optional; sensible defaults are applied (curr
 
 | Method | Use it to |
 | - | - |
-| `RecordPageView( path, language, pageVariantId, channel, referrerUrl, searchData, extraParams, requestedAt )` | Record a page view. The SDK records the initial view for you via the token endpoint; call this for client-side navigations you want counted. |
+| `RecordPageView( path, language, pageVariantId, channel, referrerUrl, searchData, extraParams, requestedAt )` | Record a page view. `<SitecoreRouter>` calls this on every router navigation, so call it yourself only for views the router does not see. |
 | `RecordCustomEvent( eventName, path, language, channel, searchData, extraParams, requestedAt, params eventProperties )` | Record an arbitrary named event with optional key/value properties. |
 | `RecordFormEvent( componentInstanceId, formId, interaction, requestedAt )` | Record a form interaction (e.g. viewed, submitted) using the `FormInteraction` enum. |
 | `IdentifyUser( user, path, language, channel, extraParams, requestedAt )` | Associate the current visitor with a `SitecoreIdentity` (email, name, address, custom identifiers). Only fires when event tracking is consented and a browser context id exists. |
